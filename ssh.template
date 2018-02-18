@@ -1,0 +1,27 @@
+ENDOFSIGSTART=
+set -e
+
+SSH_KEY="###SSH_KEY###"
+SCRIPT_URL="###SCRIPT_URL###"
+
+echo "[$SCRIPT_URL] installing ssh key on this host ($USER@$HOSTNAME)"
+
+[ ! -d ~/.ssh ] && mkdir -p -m0700 ~/.ssh
+
+cd ~/.ssh && (
+
+if [ ! -f authorized_keys ]; then
+  echo "[$SCRIPT_URL] creating authorized_keys"
+  touch authorized_keys 
+  chmod 0600 authorized_keys
+fi
+
+if ! grep -q "$SSH_KEY" authorized_keys; then
+  echo "[$SCRIPT_URL] ssh_key is not in authorized_keys"
+  [ ! -z "$(tail -c 1 authorized_keys)" ] && echo >> authorized_keys #insert newline
+  echo "$SSH_KEY" >> authorized_keys && echo "[$SCRIPT_URL] key added"
+else
+  echo "[$SCRIPT_URL] key already exists, not added"
+fi
+)
+exit 0
